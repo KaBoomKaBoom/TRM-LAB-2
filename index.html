@@ -72,6 +72,33 @@
     let keyScanned = false;
     let imageShown = false;
 
+    // Remove loading screen when AR.js is ready
+    window.addEventListener('load', () => {
+      const scene = document.querySelector('a-scene');
+      
+      // Method 1: Wait for arjs-video-loaded event
+      scene.addEventListener('arjs-video-loaded', () => {
+        console.log('AR.js video loaded');
+        document.querySelector('.arjs-loader').style.display = 'none';
+      });
+
+      // Method 2: Fallback - check if scene is loaded after timeout
+      setTimeout(() => {
+        if (scene.hasLoaded) {
+          console.log('Scene loaded - removing loader');
+          document.querySelector('.arjs-loader').style.display = 'none';
+        }
+      }, 3000);
+
+      // Method 3: Another fallback - listen for loaded event
+      scene.addEventListener('loaded', () => {
+        setTimeout(() => {
+          console.log('Scene fully loaded');
+          document.querySelector('.arjs-loader').style.display = 'none';
+        }, 1000);
+      });
+    });
+
     // Tap the car → prompt to scan key
     document.querySelector("#car").addEventListener("click", () => {
       if (!carTapped) {
