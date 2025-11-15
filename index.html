@@ -32,7 +32,15 @@
     arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
   >
     <!-- Car Marker -->
-    <a-nft id="marker-car" type="nft" url="markers/carfront/carfront">
+    <a-nft 
+      id="marker-car" 
+      type="nft" 
+      url="markers/carfront/carfront"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance=".01"
+      smoothThreshold="5"
+    >
       <a-entity id="car"
         gltf-model="images/carfront.jpg"
         scale="0.5 0.5 0.5"
@@ -44,7 +52,15 @@
     </a-nft>
 
     <!-- Key Marker -->
-    <a-nft id="marker-key" type="nft" url="markers/key/key">
+    <a-nft 
+      id="marker-key" 
+      type="nft" 
+      url="markers/key/key"
+      smooth="true"
+      smoothCount="10"
+      smoothTolerance=".01"
+      smoothThreshold="5"
+    >
       <a-entity id="key"
         gltf-model="images/key.jpg"
         scale="0.2 0.2 0.2"
@@ -99,31 +115,48 @@
       });
     });
 
-    // Tap the car → prompt to scan key
-    document.querySelector("#car").addEventListener("click", () => {
-      if (!carTapped) {
-        carTapped = true;
-        document.querySelector("#text-car").setAttribute("text", "value: Now scan the key marker!");
-      }
-    });
+    // Wait for scene to load before adding event listeners
+    const scene = document.querySelector('a-scene');
+    scene.addEventListener('loaded', () => {
+      // Add marker detection logging
+      const markerCar = document.querySelector("#marker-car");
+      const markerKey = document.querySelector("#marker-key");
 
-    // Key marker scanned → reveal key
-    document.querySelector("#marker-key").addEventListener("markerFound", () => {
-      if (carTapped && !keyScanned) {
-        keyScanned = true;
-        document.querySelector("#key").setAttribute("visible", "true");
-        document.querySelector("#text-key").setAttribute("text", "value: Tap the key to reveal the surprise!; color: cyan");
-        document.querySelector("#text-key").setAttribute("visible", "true");
-      }
-    });
+      markerCar.addEventListener('markerFound', () => {
+        console.log('Car marker found!');
+      });
 
-    // Tap the key → show image
-    document.querySelector("#key").addEventListener("click", () => {
-      if (keyScanned && !imageShown) {
-        imageShown = true;
-        document.querySelector("#surprise-image").setAttribute("visible", "true");
-        document.querySelector("#text-car").setAttribute("text", "value: You unlocked the surprise!; color: red");
-      }
+      markerCar.addEventListener('markerLost', () => {
+        console.log('Car marker lost');
+      });
+
+      // Tap the car → prompt to scan key
+      document.querySelector("#car").addEventListener("click", () => {
+        if (!carTapped) {
+          carTapped = true;
+          document.querySelector("#text-car").setAttribute("text", "value: Now scan the key marker!");
+        }
+      });
+
+      // Key marker scanned → reveal key
+      markerKey.addEventListener("markerFound", () => {
+        console.log('Key marker found!');
+        if (carTapped && !keyScanned) {
+          keyScanned = true;
+          document.querySelector("#key").setAttribute("visible", "true");
+          document.querySelector("#text-key").setAttribute("text", "value: Tap the key to reveal the surprise!; color: cyan");
+          document.querySelector("#text-key").setAttribute("visible", "true");
+        }
+      });
+
+      // Tap the key → show image
+      document.querySelector("#key").addEventListener("click", () => {
+        if (keyScanned && !imageShown) {
+          imageShown = true;
+          document.querySelector("#surprise-image").setAttribute("visible", "true");
+          document.querySelector("#text-car").setAttribute("text", "value: You unlocked the surprise!; color: red");
+        }
+      });
     });
   </script>
 </body>
