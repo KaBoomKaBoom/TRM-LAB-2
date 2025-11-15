@@ -143,6 +143,16 @@
         scale="100 100 100" 
         visible="false">
       </a-image>
+      
+      <a-text id="text-surprise" 
+        value="You unlocked the surprise!" 
+        color="red" 
+        position="0 50 50" 
+        rotation="-90 0 0" 
+        align="center" 
+        scale="20 20 20" 
+        material="depthTest: false;" 
+        visible="false"></a-text>
     </a-nft>
 
     <a-entity camera>
@@ -197,38 +207,63 @@
         console.log('Car marker lost');
       });
 
-      // --- Tap the car → prompt to scan key ---
+      // --- Tap handling with proper routing ---
       const carEntity = document.querySelector("#car");
       const textCarEntity = document.querySelector("#text-car");
+      const keyEntity = document.querySelector("#key");
+      const textKeyEntity = document.querySelector("#text-key");
       
       const handleCarTap = (event) => {
         console.log('=== CAR TAP EVENT ===' );
         console.log('Event type:', event.type);
         console.log('Target element:', event.target.id);
-        console.log('carTapped before:', carTapped);
-        
-        // This check is now removed, as this handler is only
-        // attached to the car and its text.
         
         if (!carTapped) {
           carTapped = true;
           textCarEntity.setAttribute("value", "Now scan the key marker!");
-          console.log('Text updated to:', textCarEntity.getAttribute('value'));
-          console.log('carTapped after:', carTapped);
+          console.log('Car tapped! carTapped:', carTapped);
         } else {
           console.log('Car already tapped, ignoring...');
         }
-        console.log('===================');
       };
       
-      // We removed the global scene click listener.
-      // We only need these direct listeners, which are triggered by the raycaster.
-      carEntity.addEventListener("click", handleCarTap);
-      carEntity.addEventListener("touchstart", handleCarTap);
-      textCarEntity.addEventListener("click", handleCarTap);
-      textCarEntity.addEventListener("touchstart", handleCarTap);
-
-
+      const handleKeyTap = (event) => {
+        console.log('=== KEY TAP EVENT ===');
+        console.log('Event type:', event.type);
+        console.log('Target element:', event.target.id);
+        
+        if (keyScanned && !imageShown) {
+          imageShown = true;
+          const surpriseImage = document.querySelector("#surprise-image");
+          const textSurprise = document.querySelector("#text-surprise");
+          
+          surpriseImage.setAttribute("visible", "true");
+          textSurprise.setAttribute("visible", "true");
+          keyEntity.setAttribute("visible", "false");
+          textKeyEntity.setAttribute("visible", "false");
+          
+          console.log('Key tapped! Surprise revealed! imageShown:', imageShown);
+        } else {
+          console.log('Conditions not met - keyScanned:', keyScanned, 'imageShown:', imageShown);
+        }
+      };
+      
+      // SINGLE global click handler that routes correctly
+      scene.addEventListener('click', (event) => {
+        const targetId = event.target.id;
+        console.log('>>> GLOBAL CLICK - Target:', targetId);
+        
+        // Route based on what was actually clicked
+        if (targetId === 'key' || targetId === 'text-key') {
+          console.log('>>> Routing to KEY handler');
+          handleKeyTap(event);
+        } else if (targetId === 'car' || targetId === 'text-car') {
+          console.log('>>> Routing to CAR handler');
+          handleCarTap(event);
+        } else {
+          console.log('>>> Unknown target, ignoring');
+        }
+      });
       // --- Key marker scanned → reveal key ---
       markerKey.addEventListener("markerFound", () => {
         console.log('=== KEY MARKER FOUND ===');
@@ -237,8 +272,6 @@
         
         if (carTapped && !keyScanned) {
           keyScanned = true;
-          const keyEntity = document.querySelector("#key");
-          const textKeyEntity = document.querySelector("#text-key");
           
           keyEntity.setAttribute("visible", "true");
           textKeyEntity.setAttribute("value", "Tap the key to reveal the surprise!");
@@ -251,45 +284,6 @@
         }
         console.log('========================');
       });
-
-      // --- Tap the key → show image ---
-      const keyEntity = document.querySelector("#key");
-      const textKeyEntity = document.querySelector("#text-key");
-      
-      const handleKeyTap = (event) => {
-        console.log('=== KEY TAP EVENT ===');
-        console.log('Event type:', event.type);
-        console.log('Target element:', event.target.id);
-        console.log('keyScanned:', keyScanned);
-        console.log('imageShown before:', imageShown);
-        
-        if (keyScanned && !imageShown) {
-          imageShown = true;
-          const surpriseImage = document.querySelector("#surprise-image");
-          
-          // Show the surprise image
-          surpriseImage.setAttribute("visible", "true");
-          
-          // Hide the key and its text
-          keyEntity.setAttribute("visible", "false");
-          textKeyEntity.setAttribute("visible", "false");
-          
-          // Update the car text for the next time it's seen
-          textCarEntity.setAttribute("value", "You unlocked the surprise!");
-          
-          console.log('Surprise image visibility:', surpriseImage.getAttribute('visible'));
-          console.log('imageShown after:', imageShown);
-        } else {
-          console.log('Conditions not met - keyScanned:', keyScanned, 'imageShown:', imageShown);
-        }
-        console.log('====================');
-      };
-      
-      // Add simplified listeners for the key
-      keyEntity.addEventListener("click", handleKeyTap);
-      keyEntity.addEventListener("touchstart", handleKeyTap);
-      textKeyEntity.addEventListener("click", handleKeyTap);
-      textKeyEntity.addEventListener("touchstart", handleKeyTap);
     });
   </script>
 </body>
