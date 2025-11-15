@@ -6,9 +6,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <title>AR Experience</title>
   
-  <!-- A-Frame and AR.js with Pattern Markers -->
+  <!-- A-Frame and AR.js with NFT Markers -->
   <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
 
   <style>
     * {
@@ -78,10 +78,18 @@
     vr-mode-ui="enabled: false;"
     renderer="logarithmicDepthBuffer: true; colorManagement: true; sortObjects: true; physicallyCorrectLights: true;"
     embedded
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960;"
   >
-    <!-- Car Marker - Using Hiro preset -->
-    <a-marker id="marker-car" preset="hiro" smooth="true">
+    <!-- Car Marker - Using custom NFT -->
+    <a-nft
+      id="marker-car"
+      type="nft"
+      url="carfront"
+      smooth="true"
+      smoothCount="20"
+      smoothTolerance="1"
+      smoothThreshold="10"
+    >
       <a-image id="car"
         src="images/carfront.jpg"
         scale="1 1 1"
@@ -91,10 +99,18 @@
 
       <!-- Text hint -->
       <a-text id="text-car" value="Tap the car to unlock the key..." color="yellow" position="0 0 0.6" align="center" scale="0.5 0.5 0.5"></a-text>
-    </a-marker>
+    </a-nft>
 
-    <!-- Key Marker - Using Kanji preset -->
-    <a-marker id="marker-key" preset="kanji" smooth="true">
+    <!-- Key Marker - Using custom NFT -->
+    <a-nft
+      id="marker-key"
+      type="nft"
+      url="key"
+      smooth="true"
+      smoothCount="20"
+      smoothTolerance="1"
+      smoothThreshold="10"
+    >
       <a-image id="key"
         src="images/key.jpg"
         scale="1 1 1"
@@ -103,10 +119,10 @@
         visible="false">
       </a-image>
       <a-text id="text-key" value="" color="cyan" position="0 0 0.6" align="center" scale="0.5 0.5 0.5" visible="false"></a-text>
-    </a-marker>
+    </a-nft>
 
     <!-- Surprise Image (hidden initially) -->
-    <a-marker preset="hiro">
+    <a-nft type="nft" url="carfront">
       <a-image id="surprise-image" 
         src="images/unlock.jpg" 
         position="0 0 0" 
@@ -114,7 +130,7 @@
         scale="2 1.2 1" 
         visible="false">
       </a-image>
-    </a-marker>
+    </a-nft>
 
     <a-entity camera></a-entity>
   </a-scene>
@@ -171,7 +187,7 @@
       const handleCarTap = () => {
         if (!carTapped) {
           carTapped = true;
-          document.querySelector("#text-car").setAttribute("value", "Now scan the Kanji marker!");
+          document.querySelector("#text-car").setAttribute("value", "Now scan the key marker!");
           console.log('Car tapped!');
         }
       };
