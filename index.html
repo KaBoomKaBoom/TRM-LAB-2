@@ -1,6 +1,6 @@
-<!-- A-Frame and AR.js -->
+<!-- A-Frame and AR.js with Pattern Markers -->
 <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
 <style>
   .arjs-loader {
@@ -29,56 +29,43 @@
     vr-mode-ui="enabled: false;"
     renderer="logarithmicDepthBuffer: true;"
     embedded
-    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+    arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
   >
-    <!-- Car Marker -->
-    <a-nft 
-      id="marker-car" 
-      type="nft" 
-      url="carfront"
-      smooth="true"
-      smoothCount="10"
-      smoothTolerance=".01"
-      smoothThreshold="5"
-    >
-      <a-entity id="car"
-        gltf-model="images/carfront.jpg"
-        scale="0.5 0.5 0.5"
-        position="0 0 0">
-      </a-entity>
+    <!-- Car Marker - Using Hiro preset -->
+    <a-marker id="marker-car" preset="hiro" smooth="true">
+      <a-image id="car"
+        src="images/carfront.jpg"
+        scale="1 1 1"
+        position="0 0 0"
+        rotation="-90 0 0">
+      </a-image>
 
       <!-- Text hint -->
-      <a-entity id="text-car" text="value: Tap the car to unlock the key...; color: yellow" position="0 2 0"></a-entity>
-    </a-nft>
+      <a-text id="text-car" value="Tap the car to unlock the key..." color="yellow" position="0 0.5 0" align="center" scale="0.5 0.5 0.5"></a-text>
+    </a-marker>
 
-    <!-- Key Marker -->
-    <a-nft 
-      id="marker-key" 
-      type="nft" 
-      url="key"
-      smooth="true"
-      smoothCount="10"
-      smoothTolerance=".01"
-      smoothThreshold="5"
-    >
-      <a-entity id="key"
-        gltf-model="images/key.jpg"
-        scale="0.2 0.2 0.2"
+    <!-- Key Marker - Using Kanji preset -->
+    <a-marker id="marker-key" preset="kanji" smooth="true">
+      <a-image id="key"
+        src="images/key.jpg"
+        scale="1 1 1"
         position="0 0 0"
+        rotation="-90 0 0"
         visible="false">
-      </a-entity>
-      <a-entity id="text-key" text="value: " position="0 1 0" visible="false"></a-entity>
-    </a-nft>
+      </a-image>
+      <a-text id="text-key" value="" color="cyan" position="0 0.5 0" align="center" scale="0.5 0.5 0.5" visible="false"></a-text>
+    </a-marker>
 
     <!-- Surprise Image (hidden initially) -->
-    <a-plane id="surprise-image" 
-      src="images/unlock.jpg" 
-      position="0 1 0" 
-      rotation="-90 0 0" 
-      width="2" 
-      height="1.2" 
-      visible="false">
-    </a-plane>
+    <a-marker preset="hiro">
+      <a-image id="surprise-image" 
+        src="images/unlock.jpg" 
+        position="0 0 0" 
+        rotation="-90 0 0" 
+        scale="2 1.2 1" 
+        visible="false">
+      </a-image>
+    </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
@@ -134,7 +121,7 @@
       document.querySelector("#car").addEventListener("click", () => {
         if (!carTapped) {
           carTapped = true;
-          document.querySelector("#text-car").setAttribute("text", "value: Now scan the key marker!");
+          document.querySelector("#text-car").setAttribute("value", "Now scan the Kanji marker!");
         }
       });
 
@@ -144,7 +131,7 @@
         if (carTapped && !keyScanned) {
           keyScanned = true;
           document.querySelector("#key").setAttribute("visible", "true");
-          document.querySelector("#text-key").setAttribute("text", "value: Tap the key to reveal the surprise!; color: cyan");
+          document.querySelector("#text-key").setAttribute("value", "Tap the key to reveal the surprise!");
           document.querySelector("#text-key").setAttribute("visible", "true");
         }
       });
@@ -154,7 +141,7 @@
         if (keyScanned && !imageShown) {
           imageShown = true;
           document.querySelector("#surprise-image").setAttribute("visible", "true");
-          document.querySelector("#text-car").setAttribute("text", "value: You unlocked the surprise!; color: red");
+          document.querySelector("#text-car").setAttribute("value", "You unlocked the surprise!");
         }
       });
     });
