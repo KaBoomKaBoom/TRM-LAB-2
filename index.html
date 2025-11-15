@@ -1,26 +1,52 @@
-<!-- A-Frame and AR.js with Pattern Markers -->
-<script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
-<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>AR Experience</title>
+  
+  <!-- A-Frame and AR.js with Pattern Markers -->
+  <script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
-<style>
-  .arjs-loader {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .arjs-loader div {
-    text-align: center;
-    font-size: 1.25em;
-    color: white;
-  }
-</style>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    .arjs-loader {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .arjs-loader div {
+      text-align: center;
+      font-size: 1.25em;
+      color: white;
+    }
+  </style>
+</head>
 
 <body style="margin: 0; overflow: hidden;">
   <div class="arjs-loader"><div>Loading, please wait...</div></div>
@@ -41,7 +67,7 @@
       </a-image>
 
       <!-- Text hint -->
-      <a-text id="text-car" value="Tap the car to unlock the key..." color="yellow" position="0 0.5 0" align="center" scale="0.5 0.5 0.5"></a-text>
+      <a-text id="text-car" value="Tap the car to unlock the key..." color="yellow" position="0 0 0.6" align="center" scale="0.5 0.5 0.5"></a-text>
     </a-marker>
 
     <!-- Key Marker - Using Kanji preset -->
@@ -53,7 +79,7 @@
         rotation="-90 0 0"
         visible="false">
       </a-image>
-      <a-text id="text-key" value="" color="cyan" position="0 0.5 0" align="center" scale="0.5 0.5 0.5" visible="false"></a-text>
+      <a-text id="text-key" value="" color="cyan" position="0 0 0.6" align="center" scale="0.5 0.5 0.5" visible="false"></a-text>
     </a-marker>
 
     <!-- Surprise Image (hidden initially) -->
@@ -117,13 +143,17 @@
         console.log('Car marker lost');
       });
 
-      // Tap the car → prompt to scan key
-      document.querySelector("#car").addEventListener("click", () => {
+      // Tap the car → prompt to scan key (support both click and touch)
+      const carEntity = document.querySelector("#car");
+      const handleCarTap = () => {
         if (!carTapped) {
           carTapped = true;
           document.querySelector("#text-car").setAttribute("value", "Now scan the Kanji marker!");
+          console.log('Car tapped!');
         }
-      });
+      };
+      carEntity.addEventListener("click", handleCarTap);
+      carEntity.addEventListener("touchstart", handleCarTap);
 
       // Key marker scanned → reveal key
       markerKey.addEventListener("markerFound", () => {
@@ -136,14 +166,19 @@
         }
       });
 
-      // Tap the key → show image
-      document.querySelector("#key").addEventListener("click", () => {
+      // Tap the key → show image (support both click and touch)
+      const keyEntity = document.querySelector("#key");
+      const handleKeyTap = () => {
         if (keyScanned && !imageShown) {
           imageShown = true;
           document.querySelector("#surprise-image").setAttribute("visible", "true");
           document.querySelector("#text-car").setAttribute("value", "You unlocked the surprise!");
+          console.log('Key tapped! Surprise revealed!');
         }
-      });
+      };
+      keyEntity.addEventListener("click", handleKeyTap);
+      keyEntity.addEventListener("touchstart", handleKeyTap);
     });
   </script>
 </body>
+</html>
